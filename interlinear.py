@@ -24,7 +24,7 @@ def dump_book(name, bno):
     r=db.use_result()
    
     # load json chapter
-    path="concordance/"+name+"/"
+    path="src/"+name+"/"
     filename = path+cno+".json"
     with open(filename) as data_file:
 
@@ -44,11 +44,11 @@ def dump_book(name, bno):
           # lookup interlinear text
           match = [v for v in uverse if v['number'] == strongs]
           if len(match) > 0:
-             for m in match:
-               interlinear.append(m)
+             interlinear.append(match[0])
           else:
              no_match = {"text": "", "number": strongs}
              interlinear.append(no_match)
+
   return interlinear
 
 if __name__ == "__main__":
@@ -62,6 +62,6 @@ if __name__ == "__main__":
     data = dump_book(name, bno)
   
     # write out 
-    book = open(name+".json", "w")
+    book = open("interlinear/"+name+".json", "w")
     jsdata = json.dumps(data)
     book.write(jsdata)
