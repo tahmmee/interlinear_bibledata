@@ -17,7 +17,7 @@ def dump_book(name, bno):
   # iterate over each chapter of the book
   for i in xrange(1,nchapters+1):
    cno = str(i)
-   nverses = int(stats[book][cno])+1
+   nverses = int(stats[bno][cno])+1
    for j in xrange(1,nverses):
     vno = str(j)
     db.query("""select strongs from bible_original where book={} and chapter={} and verse={}""".format(bno, cno, vno))
@@ -36,7 +36,10 @@ def dump_book(name, bno):
              break
 
           # get strongs num
-          strongs = 'g'+val[0][0]
+          strongs_prefix = 'h'
+          if int(bno) >= 40:
+              strongs_prefix = 'g'
+          strongs = strongs_prefix+val[0][0]
 
           # lookup interlinear text
           match = [v for v in uverse if v['number'] == strongs]
@@ -46,10 +49,19 @@ def dump_book(name, bno):
           else:
              no_match = {"text": "", "number": strongs}
              interlinear.append(no_match)
-  print json.dumps(interlinear)
+  return interlinear
 
-for b in books:
-  name = b["n"] 
-  bno=str(b["b"])
+if __name__ == "__main__":
 
-  dump_book(name, bno)
+  # iterate over all the books
+  for b in books:
+  
+    # get data
+    name = b["n"] 
+    bno=str(b["b"])
+    data = dump_book(name, bno)
+  
+    # write out 
+    book = open(name+".json", "w")
+    jsdata = json.dumps(data)
+    book.write(jsdata)
