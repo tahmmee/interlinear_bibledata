@@ -1,7 +1,7 @@
 import _mysql
 import json
 db=_mysql.connect("localhost","root","couchbase","default")
-stat_file = open("stats.json")
+stat_file = open("stats_quirk.json")  # without 2 ki 22, 3 john 15
 stats = json.load(stat_file)
 book_file = open("books.json")
 books = json.load(book_file)
@@ -22,10 +22,14 @@ def dump_book(name, bno):
     vno = str(j)
     db.query("""select strongs from bible_original where book={} and chapter={} and verse={}""".format(bno, cno, vno))
     r=db.use_result()
-   
+
+    words = []
+    doc_id = "{}{}{}".format(bno.zfill(2), cno.zfill(3), vno.zfill(3))
+
     # load json chapter
     path="src/"+name+"/"
     filename = path+cno+".json"
+    i = 0
     with open(filename) as data_file:
 
         # get the unordered json verse
@@ -43,12 +47,19 @@ def dump_book(name, bno):
 
           # lookup interlinear text
           match = [v for v in uverse if v['number'] == strongs]
-          if len(match) > 0:
-             interlinear.append(match[0])
-          else:
-             no_match = {"text": "", "number": strongs}
-             interlinear.append(no_match)
 
+          # append word
+          doc = None 
+          if len(match) > 0:
+             doc = match[0]
+          else:
+             doc = {"text": "", "number": strongs}
+          doc["i"] = i
+          words.append(doc)
+          i += 1
+
+    # append verse
+    interlinear.append({"id": doc_id, "verse": words})
   return interlinear
 
 if __name__ == "__main__":
