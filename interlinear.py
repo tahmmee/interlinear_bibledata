@@ -1,6 +1,6 @@
 import _mysql
 import json
-db=_mysql.connect("localhost","root","couchbase","default")
+db=_mysql.connect("localhost","root","","default")
 stat_file = open("stats_quirk.json")  # without 2 ki 22, 3 john 15
 stats = json.load(stat_file)
 book_file = open("books.json")
