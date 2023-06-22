@@ -73,3 +73,6 @@ Temporary Items
 
 ### Databass;
 *.sql
+
+*.zip
+*.gz
